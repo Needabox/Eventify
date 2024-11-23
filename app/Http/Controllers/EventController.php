@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Models\RegisterEvent;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -63,5 +65,32 @@ class EventController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Register event.
+     */
+    public function registerEvent(Request $request)
+    {
+        $event = Event::find($request->event_id);
+
+        // Check jika user sudah terdaftar
+        $check = $event->registerEvents()->where('user_id', Auth::user()->id)->first();
+        if ($check) {
+            session()->flash('error', 'Anda sudah terdaftar dalam acara ini.');
+            return redirect()->route('detail-event', $request->event_id);
+        }
+
+        // Lakukan pendaftaran
+        RegisterEvent::create([
+            'code' => 'REG-' . time(),
+            'user_id' => Auth::user()->id,
+            'event_id' => $request->event_id,
+            'status' => 1,
+            'virtual_account' => $request->virtual_account
+        ]);
+
+        session()->flash('success', 'Pendaftaran berhasil.');
+        return redirect()->route('detail-event', $request->event_id);
     }
 }

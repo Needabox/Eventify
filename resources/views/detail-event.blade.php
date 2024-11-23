@@ -160,6 +160,17 @@
 
 <body>
     <header class="event-header">
+        @if (session('error'))
+            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="container">
             <h1>{{ $event->name }}</h1>
             <div class="event-image-placeholder">
@@ -177,38 +188,22 @@
                 </p>
             </section>
 
-            {{-- <section class="event-highlights">
-                <h2>Apa yang Akan Kamu Temukan?</h2>
-                <ul>
-                    <li><strong>Fashion Show:</strong> Saksikan peragaan busana yang menakjubkan, di mana mahasiswa
-                        berbakat kami akan memamerkan koleksi terbaru mereka.</li>
-                    <li><strong>Workshop Kreatif:</strong> Ikuti rahasia di balik penampilan yang stylish dengan
-                        bergabung di workshop interaktif kami.</li>
-                    <li><strong>Bazaar Fashion:</strong> Temukan produk fashion unik dari desainer brand lokal yang
-                        mengusung keunikan gaya kamu!</li>
-                </ul>
-            </section> --}}
-
-            {{-- <section class="event-ticket">
-                <h2>Tiket</h2>
-                <p>Mahasiswa UNJ: Rp 20.000</p>
-                <p>Umum: Rp 30.000</p>
-            </section> --}}
-
             <section class="event-contact">
                 <h2>Informasi Lebih Lanjut</h2>
                 <p>Email: eventify@unj.ac.id</p>
                 <p>Instagram: @eventify_unj</p>
             </section>
 
-            @if ($event->event_type == 1)
-                <a href="#" class="btn buy-tickets">Register</a>
-            @else
-                <form action="" method="post" enctype="multipart/form-data">
-                    @csrf
+            <form action="{{ route('register-event') }}" method="post" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
+
+                @if ($event->event_type == 1)
+                    <button type="submit" class="btn buy-tickets">Register</button>
+                @else
                     <!-- Pilihan Tipe Pembayaran -->
                     <label for="payment_type">Pilih Tipe Pembayaran:</label>
-                    <select name="payment_type" id="payment_type">
+                    <select name="payment_type" id="payment_type" required>
                         <option value="" selected disabled>Pilih Tipe Pembayaran</option>
                         <option value="bca">BCA Virtual Account</option>
                         <option value="mandiri">Mandiri Virtual Account</option>
@@ -219,19 +214,21 @@
                     <div id="virtual_account_container" class="hidden">
                         <div class="virtual-account">
                             Nomor Virtual Account Anda: <strong id="virtual_account_number"></strong>
+                            <input type="hidden" name="virtual_account" id="virtual_account_input" value="">
                         </div>
                     </div>
                     <br>
-                    <a href="#" class="btn buy-tickets">Pay</a>
-                </form>
-            @endif
+                    <button type="submit" class="btn buy-tickets">Pay</a>
+                @endif
+            </form>
         </div>
     </main>
     <script>
-        // JavaScript untuk menampilkan Virtual Account secara otomatis
+        // Ambil elemen-elemen yang diperlukan
         const paymentTypeSelect = document.getElementById('payment_type');
         const virtualAccountContainer = document.getElementById('virtual_account_container');
-        const virtualAccountNumber = document.getElementById('virtual_account_number');
+        const virtualAccountNumber = document.getElementById('virtual_account_number'); // Untuk menampilkan nomor
+        const virtualAccountInput = document.getElementById('virtual_account_input'); // Input hidden untuk form
 
         // Fungsi untuk menghasilkan nomor Virtual Account acak
         function generateVirtualAccount(type) {
@@ -245,14 +242,16 @@
             return `${prefix}${randomNumber}`;
         }
 
-        // Event listener untuk menampilkan Virtual Account
+        // Event listener untuk menampilkan dan mengatur nomor VA
         paymentTypeSelect.addEventListener('change', function() {
             if (this.value) {
                 const vaNumber = generateVirtualAccount(this.value); // Generate nomor VA berdasarkan tipe
-                virtualAccountNumber.textContent = vaNumber; // Tampilkan nomor di elemen
+                virtualAccountNumber.textContent = vaNumber; // Tampilkan nomor di elemen <strong>
+                virtualAccountInput.value = vaNumber; // Set nilai input hidden
                 virtualAccountContainer.classList.remove('hidden'); // Tampilkan container
             } else {
                 virtualAccountContainer.classList.add('hidden'); // Sembunyikan jika tidak ada tipe pembayaran
+                virtualAccountInput.value = ''; // Kosongkan nilai input hidden
             }
         });
     </script>

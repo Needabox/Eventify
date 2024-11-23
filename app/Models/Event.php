@@ -26,4 +26,9 @@ class Event extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function registerEvents()
+    {
+        return $this->hasMany(RegisterEvent::class, 'event_id');
+    }
 }
