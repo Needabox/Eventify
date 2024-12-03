@@ -39,6 +39,16 @@ class UserResource extends Resource
                         0 => 'Suspended',
                     ])
                     ->default(1),
+                Forms\Components\Select::make('roles')
+                    ->multiple()
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->label('Role')
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Role Name')
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -60,6 +70,12 @@ class UserResource extends Resource
                         'success' => fn($state) => $state == 1,
                         'danger' => fn($state) => $state == 0,
                     ]),
+                Tables\Columns\BadgeColumn::make('roles.name')
+                    ->label('Role')
+                    ->colors([
+                        'success' => 'Admin',
+                        'primary' => 'Organizer',
+                    ])
 
             ])
             ->filters([
