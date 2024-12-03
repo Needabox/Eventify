@@ -23,63 +23,44 @@ class EventResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\FileUpload::make('photo')
-                    ->label('Photo')
-                    ->image()
-                    ->directory('event_photos')
-                    ->required()
-                    ->columnSpan('full'),
+        return $form->schema([
+            Forms\Components\FileUpload::make('photo')->label('Photo')->image()->directory('event_photos')->required()->columnSpan('full'),
 
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->label('Name')
-                    ->columnSpan('full'),
+            Forms\Components\TextInput::make('name')->required()->label('Name')->columnSpan('full'),
 
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->label('Description')
-                    ->columnSpan('full'),
+            Forms\Components\Textarea::make('description')->required()->label('Description')->columnSpan('full'),
 
-                // capacity type is select
-                Forms\Components\Select::make('capacity_type')
-                    ->required()
-                    ->label('Capacity')
-                    ->options([
-                        1 => 'Limited',
-                        2 => 'Unlimited',
-                    ])
-                    ->reactive(), // Pastikan perubahan nilai ini terdeteksi secara reaktif
+            // capacity type is select
+            Forms\Components\Select::make('capacity_type')
+                ->required()
+                ->label('Capacity')
+                ->options([
+                    1 => 'Limited',
+                    2 => 'Unlimited',
+                ])
+                ->reactive(), // Pastikan perubahan nilai ini terdeteksi secara reaktif
 
-                Forms\Components\TextInput::make('capacity_max')
-                    ->label('Capacity Max')
-                    ->reactive() // Pastikan input ini merespon perubahan
-                    ->disabled(fn ($get) => $get('capacity') === '2'), // Disabled jika kapasitas 'Unlimited'
+            Forms\Components\TextInput::make('capacity_max')
+                ->label('Capacity Max')
+                ->reactive() // Pastikan input ini merespon perubahan
+                ->disabled(fn($get) => $get('capacity') === '2'), // Disabled jika kapasitas 'Unlimited'
 
-                Forms\Components\DatePicker::make('start_date')
-                    ->required()
-                    ->label('Start Date'),
+            Forms\Components\DatePicker::make('start_date')->required()->label('Start Date'),
 
-                Forms\Components\DatePicker::make('end_date')
-                    ->required()
-                    ->label('End Date'),
+            Forms\Components\DatePicker::make('end_date')->required()->label('End Date'),
 
-                // location type is textarea
-                Forms\Components\Textarea::make('location')
-                    ->required()
-                    ->label('Location')
-                    ->columnSpan('full'),
+            // location type is textarea
+            Forms\Components\Textarea::make('location')->required()->label('Location')->columnSpan('full'),
 
-                // type event is select
-                Forms\Components\Select::make('event_type')
-                    ->required()
-                    ->label('Event Type')
-                    ->options([
-                        '1' => 'Free',
-                        '2' => 'Paid',
-                    ]),
-                ]);
+            // type event is select
+            Forms\Components\Select::make('event_type')
+                ->required()
+                ->label('Event Type')
+                ->options([
+                    '1' => 'Free',
+                    '2' => 'Paid',
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -89,17 +70,13 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('name')->label('Name')->sortable()->searchable(),
 
                 // Start Date
-                Tables\Columns\TextColumn::make('start_date')
-                    ->label('Start Date')->date(),
+                Tables\Columns\TextColumn::make('start_date')->label('Start Date')->date(),
 
                 // End Date
-                Tables\Columns\TextColumn::make('end_date')
-                    ->label('End Date')->date(),
+                Tables\Columns\TextColumn::make('end_date')->label('End Date')->date(),
 
                 // location
-                Tables\Columns\TextColumn::make('location')
-                    ->label('Location')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('location')->label('Location')->searchable(),
 
                 // status
                 Tables\Columns\BadgeColumn::make('status')
@@ -138,12 +115,26 @@ class EventResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                // Tambahkan Custom Action untuk Approve dan Reject
+                Tables\Actions\Action::make('approve')
+                    ->label('Approve')
+                    ->action(function ($record) {
+                        $record->update(['status' => 2]);
+                    })
+                    ->visible(fn() => Auth::user()->id === 1) // Hanya tampil untuk admin
+                    ->color('success')
+                    ->icon('heroicon-o-check'),
+
+                Tables\Actions\Action::make('reject')
+                    ->label('Reject')
+                    ->action(function ($record) {
+                        $record->update(['status' => 3]);
+                    })
+                    ->visible(fn() => Auth::user()->id === 1) // Hanya tampil untuk admin
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
@@ -159,9 +150,7 @@ class EventResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            RelationManagers\UsersRelationManager::class,
-        ];
+        return [RelationManagers\UsersRelationManager::class];
     }
 
     public static function getPages(): array
