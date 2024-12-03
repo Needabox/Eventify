@@ -48,10 +48,16 @@
                                 <li><a href="#">Home</a></li>
                                 <li><a href="#">About us</a></li>
                                 <li><a href="#">Events</a></li>
+                                <li><a href="">Blog</a></li>
                             </ul>
                         </nav><!-- .site-navigation -->
                     </div><!-- .col -->
 
+                    <div class="col-lg-3 d-none d-lg-block order-2 order-lg-3">
+                        <div class="buy-tickets">
+                            <a href="#" class="text-white">WELCOME, {{ Auth::user()->name }}</a>
+                        </div><!-- .buy-tickets -->
+                    </div><!-- .col -->
 
                 </div><!-- .row -->
             </div><!-- .container-fluid -->
@@ -147,7 +153,7 @@
                         </div>
                     </div>
                 @endforeach
-                <div class="col-12 col-sm-6 col-md-4">
+                {{-- <div class="col-12 col-sm-6 col-md-4">
                     <div class="next-event-wrap">
                         <figure>
                             <a href="#"><img src="images/next1.jpg" alt="1"></a>
@@ -168,7 +174,70 @@
                             <a href="#">Buy Tikets</a>
                         </footer>
                     </div>
+                </div> --}}
+            </div>
+        </div>
+    </div>
+
+    <div class="homepage-next-events">
+        <div class="container">
+            <div class="row">
+                <div class="next-events-section-header">
+                    <h2 class="entry-title">Keep Update With Us</h2>
+                    <p>Vestibulum eget lacus at mauris sagittis varius. Etiam ut venenatis dui. Nullam tellus risus,
+                        pellentesque at facilisis et, scelerisque sit amet metus. Duis vel semper turpis, ac tempus
+                        libero. Maecenas id ultrices risus. Aenean nec ornare ipsum, lacinia.</p>
                 </div>
+            </div>
+
+            <div class="row">
+                @foreach ($blogs as $blog)
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="next-event-wrap">
+                            <figure>
+                                <a href="{{ url('detail-blog/' . $blog->id) }}"><img src="{{ asset('storage/'.$blog->photo) }}" alt="Event"></a>
+                            </figure>
+
+                            <header class="entry-header">
+                                <h3 class="entry-title">{{ $blog->title }}</h3>
+                                {{-- <div class="posted-date">
+                                    {{ date('l', strtotime($event->start_date)) }}
+                                    <span>{{ date('M d, Y', strtotime($event->start_date)) }}</span>
+                                </div> --}}
+                            </header>
+
+                            {{-- <div class="entry-content">
+                                <p>{{ $event->description }}</p>
+                            </div> --}}
+
+                            {{-- <footer class="entry-footer">
+                                <a href="#">Buy Tikets</a>
+                            </footer> --}}
+                        </div>
+                    </div>
+                @endforeach
+                {{-- <div class="col-12 col-sm-6 col-md-4">
+                    <div class="next-event-wrap">
+                        <figure>
+                            <a href="#"><img src="images/next1.jpg" alt="1"></a>
+                        </figure>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">U2 Concert in Detroitt</h3>
+
+                            <div class="posted-date">Saturday <span>Jan 27, 2018</span></div>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Vestibulum eget lacus at mauris sagittis varius. Etiam ut venenatis dui. Nullam tellus
+                                risus.</p>
+                        </div>
+
+                        <footer class="entry-footer">
+                            <a href="#">Buy Tikets</a>
+                        </footer>
+                    </div>
+                </div> --}}
             </div>
         </div>
     </div>

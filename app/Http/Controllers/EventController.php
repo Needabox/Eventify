@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Blog;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Models\RegisterEvent;
@@ -15,7 +16,8 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::where('status', 2)->get();
-        return view('welcome', compact('events'));
+        $blogs = Blog::where('status', 2)->orderBy('created_at', 'desc')->limit(3)->get();
+        return view('welcome', compact('events', 'blogs'));
     }
 
     /**

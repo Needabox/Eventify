@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\EventResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventResource\RelationManagers;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class EventResource extends Resource
 {
@@ -159,7 +160,7 @@ class EventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\UsersRelationManager::class,
         ];
     }
 
